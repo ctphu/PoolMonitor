@@ -87,5 +87,105 @@ namespace PoolLibrary
                     reader.Close();
             }
         }
+
+        public static String AlgoToString(int piAlgo)
+        {
+            String result = "";
+            switch (piAlgo)
+            {
+                case 0:
+                    result = "Scrypt";
+                    break;
+                case 1:
+                    result = "SHA256";
+                    break;
+                case 2:
+                    result = "ScryptNf";
+                    break;
+                case 3:
+                    result = "X11";
+                    break;
+                case 4:
+                    result = "X13";
+                    break;
+                case 5:
+                    result = "Keccak";
+                    break;
+                case 6:
+                    result = "X15";
+                    break;
+                case 7:
+                    result = "Nist5";
+                    break;
+                case 8:
+                    result = "NeoScrypt";
+                    break;
+                case 9:
+                    result = "Lyra2RE";
+                    break;
+                case 10:
+                    result = "WhirlpoolX";
+                    break;
+                case 11:
+                    result = "Qubit";
+                    break;
+                case 12:
+                    result = "Quark";
+                    break;
+                case 13:
+                    result = "Axiom";
+                    break;
+                case 14:
+                    result = "Lyra2REv2";
+                    break;
+                case 15:
+                    result = "ScryptJaneNf16";
+                    break;
+                case 16:
+                    result = "Blake256r8";
+                    break;
+                case 17:
+                    result = "Blake256r14";
+                    break;
+                case 18:
+                    result = "Blake256r8vnl";
+                    break;
+                case 19:
+                    result = "Hodl";
+                    break;
+                case 20:
+                    result = "DaggerHashimoto";
+                    break;
+                case 21:
+                    result = "Decred";
+                    break;
+                case 22:
+                    result = "CryptoNight";
+                    break;
+                case 23:
+                    result = "Lbry";
+                    break;
+                case 24:
+                    result = "Equihash";
+                    break;
+                case 25:
+                    result = "Pascal";
+                    break;
+                case 26:
+                    result = "X11Gost";
+                    break;
+                case 27:
+                    result = "Sia";
+                    break;
+                case 28:
+                    result = "Blake2s";
+                    break;
+                case 29:
+                    result = "Skunk";
+                    break;
+            }
+            return result;
+        }
+
     }
 }

@@ -17,6 +17,7 @@ namespace PoolMonitor
         List<clsPoolBase> listPool;
         BindingSource bsListPool;
         clsPoolBase poolCurrent;
+        int iCountCheck = 0;
         public frmMonitor()
         {
             InitializeComponent();
@@ -31,6 +32,8 @@ namespace PoolMonitor
             {
                 sFileName = ofd.FileName;
                 this.Text = sFileName;
+                Properties.Settings.Default.FileName = sFileName;
+                Properties.Settings.Default.Save();
                 dgvPoolList.Enabled = true;
                 listPool = Utils.ReadFromXmlFile<List<clsPoolBase>>(sFileName);
                 bsListPool = new BindingSource { DataSource = listPool };
@@ -46,6 +49,8 @@ namespace PoolMonitor
             {
                 sFileName = sdf.FileName;
                 this.Text = sFileName;
+                Properties.Settings.Default.FileName = sFileName;
+                Properties.Settings.Default.Save();
                 dgvPoolList.Enabled = true;
                 listPool = new List<clsPoolBase>();
                 bsListPool = new BindingSource { DataSource = listPool };
@@ -125,7 +130,25 @@ namespace PoolMonitor
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-
+            if(iCountCheck == 72)
+            {
+                iCountCheck = 0;
+                foreach(clsPoolBase p in listPool)
+                {
+                    p.NiceHashCurrentSpeed();
+                    p.CheckAndEmailStatus(true);
+                }
+            }
+            else
+            {
+                iCountCheck++;
+                foreach (clsPoolBase p in listPool)
+                {
+                    p.NiceHashCurrentSpeed();
+                    p.CheckAndEmailStatus();
+                }
+            }
+            Text = sFileName + " " + iCountCheck.ToString();
         }
 
         private void btStartTimer_Click(object sender, EventArgs e)
@@ -134,12 +157,26 @@ namespace PoolMonitor
             if(timer1.Enabled)
             {
                 timer1.Stop();
-                tbTimer.Text = "Start";
+                btStartTimer.Text = "Start";
             }
             else
             {
                 timer1.Start();
-                tbTimer.Text = "Stop";
+                btStartTimer.Text = "Stop";
+            }
+        }
+
+        private void frmMonitor_Load(object sender, EventArgs e)
+        {
+            sFileName = Properties.Settings.Default.FileName;
+            if(System.IO.File.Exists(sFileName))
+            {
+                dgvPoolList.Enabled = true;
+                listPool = Utils.ReadFromXmlFile<List<clsPoolBase>>(sFileName);
+                bsListPool = new BindingSource { DataSource = listPool };
+                dgvPoolList.DataSource = bsListPool;
+                timer1.Start();
+                btStartTimer.Text = "Stop";
             }
         }
     }

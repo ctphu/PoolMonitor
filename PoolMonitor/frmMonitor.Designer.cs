@@ -45,12 +45,12 @@
             this.cbPoolName = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tbTimer = new System.Windows.Forms.TextBox();
+            this.btStartTimer = new System.Windows.Forms.Button();
             this.btNew = new System.Windows.Forms.Button();
             this.btUpdate = new System.Windows.Forms.Button();
             this.btLoad = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.btStartTimer = new System.Windows.Forms.Button();
-            this.tbTimer = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPoolList)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -212,6 +212,24 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Control";
             // 
+            // tbTimer
+            // 
+            this.tbTimer.Location = new System.Drawing.Point(102, 19);
+            this.tbTimer.Name = "tbTimer";
+            this.tbTimer.Size = new System.Drawing.Size(75, 20);
+            this.tbTimer.TabIndex = 4;
+            this.tbTimer.Text = "360000";
+            // 
+            // btStartTimer
+            // 
+            this.btStartTimer.Location = new System.Drawing.Point(102, 43);
+            this.btStartTimer.Name = "btStartTimer";
+            this.btStartTimer.Size = new System.Drawing.Size(75, 23);
+            this.btStartTimer.TabIndex = 3;
+            this.btStartTimer.Text = "Start";
+            this.btStartTimer.UseVisualStyleBackColor = true;
+            this.btStartTimer.Click += new System.EventHandler(this.btStartTimer_Click);
+            // 
             // btNew
             // 
             this.btNew.Location = new System.Drawing.Point(21, 17);
@@ -247,24 +265,6 @@
             this.timer1.Interval = 36000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // btStartTimer
-            // 
-            this.btStartTimer.Location = new System.Drawing.Point(102, 43);
-            this.btStartTimer.Name = "btStartTimer";
-            this.btStartTimer.Size = new System.Drawing.Size(75, 23);
-            this.btStartTimer.TabIndex = 3;
-            this.btStartTimer.Text = "Start";
-            this.btStartTimer.UseVisualStyleBackColor = true;
-            this.btStartTimer.Click += new System.EventHandler(this.btStartTimer_Click);
-            // 
-            // tbTimer
-            // 
-            this.tbTimer.Location = new System.Drawing.Point(102, 19);
-            this.tbTimer.Name = "tbTimer";
-            this.tbTimer.Size = new System.Drawing.Size(75, 20);
-            this.tbTimer.TabIndex = 4;
-            this.tbTimer.Text = "36000";
-            // 
             // frmMonitor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -276,6 +276,7 @@
             this.Name = "frmMonitor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "frmMonitor";
+            this.Load += new System.EventHandler(this.frmMonitor_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPoolList)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
