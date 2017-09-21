@@ -14,69 +14,127 @@ namespace PoolLibrary
         public String WorkerName { get; set; }
         public String Email { get; set; }
         public String TelegramID { get; set; }
+        public String LastMessage { get; set; }
+        public int Round { get; set; }
         public List<clsWorkerCurrent> WorkerList;
         public clsPoolBase()
         {
             WorkerList = new List<clsWorkerCurrent>();
+            Round = 72;
         }
         public void NiceHashCurrentSpeed()
         {
-            WorkerList.Clear();
-            String url;
-            url = @"https://api.nicehash.com/api?method=stats.provider.workers&addr=" + Address;
-            using (var webClient = new System.Net.WebClient())
+            
+            try
             {
-                var json = webClient.DownloadString(url);
-                //clsResultWorkerP result = JsonConvert.DeserializeObject<clsResultWorkerP>(json);
-                //MessageBox.Show(result.method);
-
-                clsResultWorker result = JsonConvert.DeserializeObject<clsResultWorker>(json);
-                for (int i = 0; i < result.result.workers.Length; i++)
+                String url;
+                url = @"https://api.nicehash.com/api?method=stats.provider.workers&addr=" + Address;
+                using (var webClient = new System.Net.WebClient())
                 {
-                    if (result.result.workers[i][0].ToString() == WorkerName)
+                    var json = webClient.DownloadString(url);
+                    //clsResultWorkerP result = JsonConvert.DeserializeObject<clsResultWorkerP>(json);
+                    //MessageBox.Show(result.method);
+                    WorkerList.Clear();
+                    clsResultWorker result = JsonConvert.DeserializeObject<clsResultWorker>(json);
+                    for (int i = 0; i < result.result.workers.Length; i++)
                     {
-                        clsWorkerSpeed wsCurrentSpeed = JsonConvert.DeserializeObject<clsWorkerSpeed>(result.result.workers[i][1].ToString());
-                        if (wsCurrentSpeed.a > 0)
+                        if (result.result.workers[i][0].ToString() == WorkerName)
                         {
-                            clsWorkerCurrent wc = new clsWorkerCurrent();
-                            wc.WorkerName = result.result.workers[i][0].ToString();
-                            wc.Speed = wsCurrentSpeed.a;
-                            wc.TimeConnect = Int32.Parse(result.result.workers[i][2].ToString());
-                            wc.Difficulty = Double.Parse(result.result.workers[i][4].ToString());
-                            wc.Algo = Int32.Parse(result.result.workers[i][6].ToString());
-                            wc.AlgoName = Utils.AlgoToString(wc.Algo);
-                            WorkerList.Add(wc);
-                        }
+                            clsWorkerSpeed wsCurrentSpeed = JsonConvert.DeserializeObject<clsWorkerSpeed>(result.result.workers[i][1].ToString());
+                            if (wsCurrentSpeed.a > 0)
+                            {
+                                clsWorkerCurrent wc = new clsWorkerCurrent();
+                                wc.Address = Address;
+                                wc.WorkerName = result.result.workers[i][0].ToString();
+                                wc.Speed = wsCurrentSpeed.a;
+                                wc.TimeConnect = Int32.Parse(result.result.workers[i][2].ToString());
+                                wc.Difficulty = Double.Parse(result.result.workers[i][4].ToString());
+                                wc.Algo = Int32.Parse(result.result.workers[i][6].ToString());
+                                wc.AlgoName = Utils.AlgoToString(wc.Algo);
+                                WorkerList.Add(wc);
+                            }
 
+                        }
                     }
+
                 }
-                
+            }
+            catch { }
+            if (WorkerList.Count == 0)
+            {
+                LastMessage = String.Format("Time: {0}, Address: {1}, Worker: {2} Fail!. Check your rig.", DateTime.Now, Address, WorkerName);
+            }
+            else
+            {
+                LastMessage = "";
+                foreach (clsWorkerCurrent wc in WorkerList)
+                {
+                    LastMessage = LastMessage + wc.ToString();
+                }
             }
             //return 0;
         }
         public void CheckAndEmailStatus(bool bSendEmail = false)
         {
-            if(WorkerList.Count == 0)
+            try
             {
-                Utils.SendEmail(Email, WorkerName + " Fail !", "Check your rig");
-            }
-            else
-            {
-                if (bSendEmail)
+                if (WorkerList.Count == 0)
                 {
-                    String sBody = "";
-                    foreach(clsWorkerCurrent wc in WorkerList)
+                    Utils.SendEmail(Email, WorkerName + " Fail !", LastMessage);
+                }
+                else
+                {
+                    if (bSendEmail)
                     {
-                        sBody = sBody + wc.ToString();
+                        Utils.SendEmail(Email, WorkerName + " Status", LastMessage);
                     }
-                    Utils.SendEmail(Email, WorkerName + " Status", sBody);
                 }
             }
+            catch { }
+        }
+        public async void CheckAndSendTelegram(TelegramApi pTele,bool bSendStatus = false)
+        {
+            try
+            {
+                if (WorkerList.Count == 0)
+                {
+                    await pTele.SendMessage(TelegramID, LastMessage);
+                }
+                else
+                {
+                    if (bSendStatus)
+                    {
+                        await pTele.SendMessage(TelegramID, LastMessage);
+                    }
+                }
+            }
+            catch { }
+        }
+        public TelegramMessage GetTelegramMessage(bool bSendStatus)
+        {
+            TelegramMessage msg = null;
+            try
+            {
+                if (WorkerList.Count == 0)
+                {
+                    msg = new TelegramMessage(TelegramID, LastMessage);
+                }
+                else
+                {
+                    if (bSendStatus)
+                    {
+                        msg = new TelegramMessage(TelegramID, LastMessage);
+                    }
+                }
+            }
+            catch { }
+            return msg;
         }
     }
 
     public class clsWorkerCurrent
     {
+        public string Address { get; set; }
         public string WorkerName { set; get; }
         public int Algo { get; set; }
         public string AlgoName { get; set; }
@@ -87,7 +145,7 @@ namespace PoolLibrary
         public override String ToString()
         {
             String sReturn;
-            sReturn = String.Format("Worker: {0} Algo: {1} Speed: {2} TimeConnect: {3} min.\n", WorkerName, AlgoName, Speed, TimeConnect);
+            sReturn = String.Format("Time: {0}, Address: {1} Worker: {2} Algo: {3} Speed: {4} TimeConnect: {5} min.\n",DateTime.Now, Address, WorkerName, AlgoName, Speed, TimeConnect);
             return sReturn;
         }
     }

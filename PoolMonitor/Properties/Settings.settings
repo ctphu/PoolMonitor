@@ -5,5 +5,8 @@
     <Setting Name="FileName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="TelegramID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">+84908151055</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

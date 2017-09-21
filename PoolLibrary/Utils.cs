@@ -85,7 +85,9 @@ namespace PoolLibrary
             {
                 if (reader != null)
                     reader.Close();
+                
             }
+            
         }
 
         public static String AlgoToString(int piAlgo)

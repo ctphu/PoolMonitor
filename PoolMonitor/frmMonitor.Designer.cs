@@ -45,12 +45,16 @@
             this.cbPoolName = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btLoginTelegram = new System.Windows.Forms.Button();
             this.tbTimer = new System.Windows.Forms.TextBox();
             this.btStartTimer = new System.Windows.Forms.Button();
             this.btNew = new System.Windows.Forms.Button();
             this.btUpdate = new System.Windows.Forms.Button();
             this.btLoad = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timerSendTelegram = new System.Windows.Forms.Timer(this.components);
+            this.cbRound = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPoolList)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -59,6 +63,8 @@
             // 
             // dgvPoolList
             // 
+            this.dgvPoolList.AllowUserToAddRows = false;
+            this.dgvPoolList.AllowUserToDeleteRows = false;
             this.dgvPoolList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -95,6 +101,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.cbRound);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.tbTelegramID);
@@ -148,7 +156,7 @@
             // 
             this.tbAddress.Location = new System.Drawing.Point(68, 45);
             this.tbAddress.Name = "tbAddress";
-            this.tbAddress.Size = new System.Drawing.Size(343, 20);
+            this.tbAddress.Size = new System.Drawing.Size(249, 20);
             this.tbAddress.TabIndex = 5;
             // 
             // label3
@@ -200,6 +208,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btLoginTelegram);
             this.groupBox2.Controls.Add(this.tbTimer);
             this.groupBox2.Controls.Add(this.btStartTimer);
             this.groupBox2.Controls.Add(this.btNew);
@@ -212,13 +221,23 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Control";
             // 
+            // btLoginTelegram
+            // 
+            this.btLoginTelegram.Location = new System.Drawing.Point(102, 69);
+            this.btLoginTelegram.Name = "btLoginTelegram";
+            this.btLoginTelegram.Size = new System.Drawing.Size(75, 23);
+            this.btLoginTelegram.TabIndex = 5;
+            this.btLoginTelegram.Text = "Login T";
+            this.btLoginTelegram.UseVisualStyleBackColor = true;
+            this.btLoginTelegram.Click += new System.EventHandler(this.btLoginTelegram_Click);
+            // 
             // tbTimer
             // 
             this.tbTimer.Location = new System.Drawing.Point(102, 19);
             this.tbTimer.Name = "tbTimer";
             this.tbTimer.Size = new System.Drawing.Size(75, 20);
             this.tbTimer.TabIndex = 4;
-            this.tbTimer.Text = "360000";
+            this.tbTimer.Text = "300000";
             // 
             // btStartTimer
             // 
@@ -262,8 +281,36 @@
             // 
             // timer1
             // 
-            this.timer1.Interval = 36000;
+            this.timer1.Interval = 300000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // timerSendTelegram
+            // 
+            this.timerSendTelegram.Interval = 3000;
+            this.timerSendTelegram.Tick += new System.EventHandler(this.timerSendTelegram_Tick);
+            // 
+            // cbRound
+            // 
+            this.cbRound.FormattingEnabled = true;
+            this.cbRound.Items.AddRange(new object[] {
+            "12",
+            "24",
+            "36",
+            "72"});
+            this.cbRound.Location = new System.Drawing.Point(364, 45);
+            this.cbRound.Name = "cbRound";
+            this.cbRound.Size = new System.Drawing.Size(47, 21);
+            this.cbRound.TabIndex = 10;
+            this.cbRound.Text = "72";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(323, 48);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(39, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Round";
             // 
             // frmMonitor
             // 
@@ -311,5 +358,9 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox tbTimer;
         private System.Windows.Forms.Button btStartTimer;
+        private System.Windows.Forms.Button btLoginTelegram;
+        private System.Windows.Forms.Timer timerSendTelegram;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox cbRound;
     }
 }

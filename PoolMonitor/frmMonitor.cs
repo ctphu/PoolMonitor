@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace PoolMonitor
@@ -17,7 +18,11 @@ namespace PoolMonitor
         List<clsPoolBase> listPool;
         BindingSource bsListPool;
         clsPoolBase poolCurrent;
-        int iCountCheck = 0;
+        int iCountCheck = 1;
+        TelegramApi teleApi = new TelegramApi();
+        List<TelegramMessage> listWaitingSendMessage = new List<TelegramMessage>();
+        //List<TelegramMessage> listSendingMessage = new List<TelegramMessage>();
+
         public frmMonitor()
         {
             InitializeComponent();
@@ -67,8 +72,10 @@ namespace PoolMonitor
                 {
                     objNiceHash.PoolName = "NiceHash";
                     //listPool.Add(objNiceHash);
+
                     bsListPool.Add(objNiceHash);
                     //bsListPool.Add(objNiceHash);
+                    dgvPoolList.Refresh();
                 }
                 catch (Exception ex)
                 {
@@ -94,6 +101,7 @@ namespace PoolMonitor
                 poolCurrent.Address = tbAddress.Text;
                 poolCurrent.Email = tbEmail.Text;
                 poolCurrent.TelegramID = tbTelegramID.Text;
+                poolCurrent.Round = Int32.Parse(cbRound.Text);
                 dgvPoolList.Refresh();
             }
             if(sFileName.Length > 0)
@@ -114,6 +122,7 @@ namespace PoolMonitor
                     tbAddress.Text = poolCurrent.Address;
                     tbEmail.Text = poolCurrent.Email;
                     tbTelegramID.Text = poolCurrent.TelegramID;
+                    cbRound.Text = poolCurrent.Round.ToString();
                 }
             }
         }
@@ -128,15 +137,22 @@ namespace PoolMonitor
         //}
 
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private async void timer1_Tick(object sender, EventArgs e)
         {
             if(iCountCheck == 72)
             {
-                iCountCheck = 0;
+                iCountCheck = 1;
                 foreach(clsPoolBase p in listPool)
                 {
                     p.NiceHashCurrentSpeed();
                     p.CheckAndEmailStatus(true);
+                    TelegramMessage msg = p.GetTelegramMessage(true);
+                    if (msg != null)
+                    {
+                        listWaitingSendMessage.Add(msg);
+                        //msg.IndexInList = listWaitingSendMessage.IndexOf(msg) + 1;
+                    }
+                    //p.CheckAndSendTelegram(teleApi, true);
                 }
             }
             else
@@ -144,11 +160,20 @@ namespace PoolMonitor
                 iCountCheck++;
                 foreach (clsPoolBase p in listPool)
                 {
+                    
                     p.NiceHashCurrentSpeed();
                     p.CheckAndEmailStatus();
+                    TelegramMessage msg = p.GetTelegramMessage(((iCountCheck) % p.Round == 0));
+                    if (msg != null)
+                    {
+                        listWaitingSendMessage.Add(msg);
+                        //msg.IndexInList = listWaitingSendMessage.IndexOf(msg) + 1;
+                    }
+                    //p.CheckAndSendTelegram(teleApi,((iCountCheck + listPool.IndexOf(p))%12==0));
                 }
             }
-            Text = sFileName + " " + iCountCheck.ToString();
+            Text = String.Format("{0} {1} {2}", sFileName ,iCountCheck, DateTime.Now);
+            dgvPoolList.Refresh();
         }
 
         private void btStartTimer_Click(object sender, EventArgs e)
@@ -157,26 +182,78 @@ namespace PoolMonitor
             if(timer1.Enabled)
             {
                 timer1.Stop();
+                timerSendTelegram.Stop();
                 btStartTimer.Text = "Start";
             }
             else
             {
                 timer1.Start();
+                timerSendTelegram.Start();
                 btStartTimer.Text = "Stop";
             }
         }
 
-        private void frmMonitor_Load(object sender, EventArgs e)
+        private async void frmMonitor_Load(object sender, EventArgs e)
         {
             sFileName = Properties.Settings.Default.FileName;
             if(System.IO.File.Exists(sFileName))
             {
                 dgvPoolList.Enabled = true;
-                listPool = Utils.ReadFromXmlFile<List<clsPoolBase>>(sFileName);
-                bsListPool = new BindingSource { DataSource = listPool };
-                dgvPoolList.DataSource = bsListPool;
-                timer1.Start();
-                btStartTimer.Text = "Stop";
+                try
+                {
+                    listPool = Utils.ReadFromXmlFile<List<clsPoolBase>>(sFileName);
+                }
+                catch { }
+                if ((listPool!=null)&&(listPool.Count > 0))
+                {
+                    bsListPool = new BindingSource { DataSource = listPool };
+                    dgvPoolList.DataSource = bsListPool;
+                    timer1.Start();
+                    timerSendTelegram.Start();
+                    btStartTimer.Text = "Stop";
+                }
+            }
+            try
+            {
+                var authorized = await teleApi.IsUserAuthorized();
+                if (!authorized)
+                {
+                    btLoginTelegram.Enabled = true;
+                }
+                else
+                {
+                    btLoginTelegram.Enabled = false;
+                }
+            }
+            catch { }
+            //teleApi.PhoneNumber = Properties.Settings.Default.TelegramID;
+
+            //await teleApi.AuthUser();
+        }
+
+        private async void btLoginTelegram_Click(object sender, EventArgs e)
+        {
+            frmLoginTelegram f = new frmLoginTelegram();
+            f.teleApi = this.teleApi;
+            f.ShowDialog();
+            var authorized = await teleApi.IsUserAuthorized();
+            if (!authorized)
+            {
+                btLoginTelegram.Enabled = true;
+            }
+            else
+            {
+                btLoginTelegram.Enabled = false;
+            }
+        }
+
+        private async void timerSendTelegram_Tick(object sender, EventArgs e)
+        {
+            if (listWaitingSendMessage.Count > 0)
+            {
+                TelegramMessage msg = listWaitingSendMessage[0];
+                await teleApi.SendMessage(msg.TelegramID, msg.Message);
+                listWaitingSendMessage.Remove(msg);
             }
         }
     }
