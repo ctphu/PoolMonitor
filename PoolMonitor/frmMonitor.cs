@@ -14,9 +14,12 @@ using System.Windows.Forms;
 //Test 3
 <<<<<<< HEAD
 //Test 4
+<<<<<<< HEAD
 //Test 5
 =======
 >>>>>>> parent of 0dc2992... T4
+=======
+>>>>>>> parent of 635bbb2... Add Test 5
 
 namespace PoolMonitor
 {
