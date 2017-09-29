@@ -12,8 +12,11 @@ using System.Windows.Forms;
 //Test
 //Test 2
 //Test 3
+<<<<<<< HEAD
 //Test 4
 //Test 5
+=======
+>>>>>>> parent of 0dc2992... T4
 
 namespace PoolMonitor
 {
